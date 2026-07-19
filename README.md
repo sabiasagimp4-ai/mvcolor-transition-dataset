@@ -1,10 +1,11 @@
-# MVの色は時代とともに変化するか — データセット & 解析コード
+# MVの色は時代とともに変化するか — データセット, 解析コード
 
 Billboard Year-End Hot 100（2005〜2025年、各年上位75曲）のミュージックビデオ n=1509本から
 色彩・編集ペースに関する特徴量を抽出し、年代トレンドを分析した研究の再現用データ・コード一式です。
+コードの多くはClaude codeにより作成されたことをご留意ください。
 
 高校の課題研究として実施したもので、本文（論文PDF/docx）はこのリポジトリには含みません。
-ここには数値データと解析コードのみを置いています。
+ここには数値データと解析コードのみを置いています。また、実際の論文には載っていないMICD(Minimum Color Difference)を用いた場合のデータも含んでいます。
 
 ## 更新履歴
 
@@ -18,7 +19,7 @@ Billboard Year-End Hot 100（2005〜2025年、各年上位75曲）のミュー�
   有意（r=0.701, p=0.0006）に変わった**。`data/year_palette_cemd.csv`,
   `data/year_palette_cemd_stats.csv`, `data/year_palette_micd.csv`は修正後の値。
 
-## 含まれていないもの（意図的に除外）
+## 含まれていないもの
 
 著作権・容量・セキュリティ上の理由で、以下は一切含みません。
 
@@ -27,7 +28,6 @@ Billboard Year-End Hot 100（2005〜2025年、各年上位75曲）のミュー�
 - YouTube Data API キー
 - TransNetV2の学習済み重み（[原論文・公式実装](https://github.com/soCzech/TransNetV2)を参照してください）
 
-公開しているのは、動画から計算した**数値特徴量のみ**です。
 
 ## フォルダ構成
 
@@ -118,10 +118,7 @@ TransNetV2本体（学習済み重み含む）は同梱していないため、�
 
 ## 主な参考文献
 
-- Skaff, S., Marchesotti, L., Csurka, G., & Saunders, C. (2011). *Toward a User-Centric Analysis for Ranking Color Palettes*. CIC.
-- Pocol, A., Istead, L., & Kaplan, C. S. (2025). *A Study on Perceptually Coherent Distance Measures for Color Schemes*. CBMI.
-- Hasler, D., & Süsstrunk, S. (2003). *Measuring colourfulness in natural images*. SPIE.
-- Souček, T., & Lokoč, J. (2020). *TransNet V2: An effective deep network architecture for fast shot transition detection*.
+参考文献に関しては、元論文をご参照ください。
 
 ## ライセンス
 
