@@ -6,6 +6,18 @@ Billboard Year-End Hot 100（2005〜2025年、各年上位75曲）のミュー�
 高校の課題研究として実施したもので、本文（論文PDF/docx）はこのリポジトリには含みません。
 ここには数値データと解析コードのみを置いています。
 
+## 更新履歴
+
+- **2026-07-19**: 年ごとの代表パレット作成（`year_palette.py`の`weighted_kmeans_palette_binned`、
+  `year_palette_micd.py`の`weighted_kmeans_palette_lab_binned`）を修正。
+  修正前は色相ビンを無視した単純加重KMeansで年パレットを作っていたため、画面占有面積の大きい
+  肌色・暗色が代表パレットのクラスタを占有し、CEMD/MICDの計算元になるパレットそのものが
+  偏っていた（レアな色相が代表パレットに反映されない）。ショット抽出時のBinned-KMeansが
+  ビンごとに保証していた公平性を年単位の再クラスタリングでも維持するよう修正した結果、
+  **CEMD（Skaff et al., CIEDE2000版, 対2005年）の結論が非有意（r=0.328, p=0.157）から
+  有意（r=0.701, p=0.0006）に変わった**。`data/year_palette_cemd.csv`,
+  `data/year_palette_cemd_stats.csv`, `data/year_palette_micd.csv`は修正後の値。
+
 ## 含まれていないもの（意図的に除外）
 
 著作権・容量・セキュリティ上の理由で、以下は一切含みません。

@@ -30,6 +30,13 @@ CIE76版とCIEDE2000版を比較検証したところ結論(非有意)自体は�
 ことを確認済み(r=0.371→0.328, p=0.107→0.157)。CIE76版はロバスト性
 チェックとして引き続き計算・出力する。
 
+【2026-07-19修正】年ごとの代表パレット作成(weighted_kmeans_palette_lab_binned)
+がBinned-KMeansのビン保護を保つよう修正された(year_palette.py参照)。
+以前は色相ビンを無視した単純加重KMeansで年パレットを作っていたため、
+画面占有面積の大きい肌色・暗色が代表パレットのクラスタを占有し、
+CEMD計算の元になるパレットそのものが偏っていた可能性がある。
+修正後の数値で再計算し、結論が変わるか要確認。
+
 使い方:
   python year_palette_cemd.py --manifest ../videos.csv --extract-dir /d/自自論_video_data/binned_kmeans_out --k 8 --out out/year_palette_cemd.csv
 """
@@ -41,7 +48,7 @@ from scipy import stats as scipy_stats
 from skimage.color import deltaE_ciede2000, deltaE_cie76
 
 from year_palette import fnum, read_manifest, collect_year_colors
-from year_palette_micd import weighted_kmeans_palette_lab
+from year_palette_micd import weighted_kmeans_palette_lab_binned
 
 
 def ciede2000_matrix(labA, labB):
@@ -89,9 +96,7 @@ def main():
 
     palettes = {}
     for year in years:
-        colors = [c for c, _ in by_year[year]]
-        weights = [w for _, w in by_year[year]]
-        palettes[year] = weighted_kmeans_palette_lab(colors, weights, args.k)
+        palettes[year] = weighted_kmeans_palette_lab_binned(by_year[year], args.k)
 
     base_year = years[0]
     labA0, wA0 = palettes[base_year]

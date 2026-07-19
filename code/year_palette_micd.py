@@ -25,7 +25,7 @@ import numpy as np
 from sklearn.cluster import KMeans
 from skimage.color import deltaE_cie76
 
-from year_palette import fnum, read_manifest, collect_year_colors, rgb_to_hue
+from year_palette import fnum, read_manifest, collect_year_colors, rgb_to_hue, allocate_k_per_bin, BIN_ORDER
 
 
 # shot_dominant_color_binned_kmeans.py と同一のsRGB D65 CIELAB変換式
@@ -57,7 +57,10 @@ def rgb_to_lab(rgb):
 
 
 def weighted_kmeans_palette_lab(colors, weights, k):
-    """rgbで加重KMeansし、(Lab centers, weight_share)を返す(色相角順にソートしない、MICD専用)。"""
+    """rgbで加重KMeansし、(Lab centers, weight_share)を返す(色相角順にソートしない、MICD専用)。
+    【非推奨・後方互換用】ビンを無視した単純KMeansのため、画面占有面積の大きい
+    肌色・暗色などが全クラスタを占有しうる。年単位のパレット作成には
+    weighted_kmeans_palette_lab_binned を使うこと。"""
     X = np.stack(colors)
     w = np.array(weights)
     k_eff = min(k, X.shape[0])
@@ -68,6 +71,41 @@ def weighted_kmeans_palette_lab(colors, weights, k):
     total_w = w.sum()
     shares = np.array([w[labels == i].sum() / total_w for i in range(k_eff)])
     centers_lab = rgb_to_lab(centers_rgb)
+    return centers_lab, shares
+
+
+def weighted_kmeans_palette_lab_binned(by_bin, k):
+    """ビンごとに加重KMeansをかけ、(Lab centers, weight_share)を返す(色相角順にソートしない)。
+    by_bin: {hue_bin: [(rgb, weight), ...]}。各ビンに最低1クラスタを保証してから
+    残りを重み比例で配分する(year_palette.allocate_k_per_bin)ため、
+    year_palette.weighted_kmeans_palette_binnedと同じビン保護をLab空間(MICD/CEMD用)でも行う。"""
+    bin_weights = {name: sum(w for _, w in entries) for name, entries in by_bin.items() if entries}
+    alloc = allocate_k_per_bin(bin_weights, k)
+    total_w_all = sum(bin_weights.values())
+    centers_rgb_list, shares_list = [], []
+    for name in BIN_ORDER:
+        k_bin = alloc.get(name, 0)
+        entries = by_bin.get(name)
+        if k_bin < 1 or not entries:
+            continue
+        colors = [c for c, _ in entries]
+        weights = [w for _, w in entries]
+        X = np.stack(colors)
+        w = np.array(weights)
+        k_eff = min(k_bin, X.shape[0])
+        km = KMeans(n_clusters=k_eff, random_state=0, n_init=10)
+        km.fit(X, sample_weight=w)
+        labels = km.labels_
+        centers = km.cluster_centers_
+        for i in range(k_eff):
+            mask = labels == i
+            cw = w[mask].sum()
+            if cw <= 0:
+                continue
+            centers_rgb_list.append(centers[i])
+            shares_list.append(cw / total_w_all)
+    centers_lab = rgb_to_lab(np.stack(centers_rgb_list))
+    shares = np.array(shares_list)
     return centers_lab, shares
 
 
@@ -94,9 +132,7 @@ def main():
 
     palettes = {}
     for year in years:
-        colors = [c for c, _ in by_year[year]]
-        weights = [w for _, w in by_year[year]]
-        palettes[year] = weighted_kmeans_palette_lab(colors, weights, args.k)
+        palettes[year] = weighted_kmeans_palette_lab_binned(by_year[year], args.k)
 
     base_year = years[0]
     labA0, wA0 = palettes[base_year]
