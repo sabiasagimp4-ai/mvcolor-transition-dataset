@@ -1,0 +1,9 @@
+numpy
+scipy
+scikit-learn
+scikit-image
+matplotlib
+Pillow
+POT
+# TransNetV2によるショット境界検出を実行する場合のみ必要（結果CSVの再利用には不要）
+# torch --index-url https://download.pytorch.org/whl/cu126
