@@ -48,11 +48,12 @@ def main():
     fig, ax = plt.subplots(figsize=(7.5, 5.5))
     ax.scatter(years, vals, s=45, color="#3a6ea5", zorder=3)
     ax.plot(xs, slope * xs + intercept, color="#c0392b", linewidth=1.5, zorder=2)
+    ptxt = "p<0.001" if p < 0.001 else f"p={p:.3f}"
     sig = "有意(p<0.05)" if p < 0.05 else "非有意"
     ax.set_title(
         f"CEMD(CIEDE2000, Skaff et al.準拠): 2005年基準の色距離\n"
-        f"slope={slope:.3f}/年  r={r:.3f}  p={p:.3f} ({sig})\n"
-        f"(TransNetV2版, n=1509, 基準年の自明点は除外)",
+        f"slope={slope:.3f}/年  r={r:.3f}  {ptxt} ({sig})\n"
+        f"(TransNetV2版、回帰のn=20(年単位、基準年の自明点は除外))",
         fontsize=11,
     )
     ax.set_xlabel("年")

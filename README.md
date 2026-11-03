@@ -56,17 +56,17 @@ code/   特徴量抽出・集計・統計・プロット用のPythonコード
 |---|---|
 | id, year, rank, artist, title | 動画識別情報 |
 | n_shots, total_dur_s | 検出されたショット数・動画全体の長さ（秒） |
-| mean_s, mean_v | HSV色空間での平均彩度・平均明度（各shotの代表色の重み付き平均） |
+| mean_s, mean_v | HSV色空間での平均彩度・平均明度（shotごとの全画素平均を、shotの長さで重み付けして平均） |
 | mean_s_std, mean_v_std | 同・年内での標準偏差ではなく動画内shot間の標準偏差 |
 | colorfulness | Hasler & Süsstrunk (2003) のcolorfulness指標 |
-| pct_chromatic | 無彩色（グレー・白・黒）ではない有彩色shotの割合 |
-| warm_cool_ratio | 暖色shot数 / 寒色shot数 |
+| pct_chromatic | 有彩色画素（HSVで彩度0.15以上かつ明度0.08以上）が全画素に占める割合（shotの長さで重み付けして平均） |
+| warm_cool_ratio | 暖色シェア / (暖色シェア + 寒色シェア)。0〜1の値で、小さいほど寒色寄り（シェアはパレット内シェア×shotの長さで重み付け） |
 | hue_entropy | 色相分布のシャノンエントロピー（色相の多様性） |
 | hue_red 〜 hue_purple | 7色相ビンそれぞれの出現割合 |
 | avg_shot_dur | 平均ショット長（秒） |
-| pct_fast_cut | 1秒未満の高速カットの割合 |
+| pct_fast_cut | 0.5秒未満の高速カットの割合 |
 | mean_L_lab, mean_C_lab | CIE Lab色空間での平均明度L*・平均彩度C* |
-| color_dynamism, color_dynamism_std, color_dynamism_max | 隣接shot間のCIEDE2000色差ΔEの平均・標準偏差・最大値（動画内でどれだけ色が動くか） |
+| color_dynamism, color_dynamism_std, color_dynamism_max | 隣接shot間のCIELAB色差ΔE76（ユークリッド距離）の平均・標準偏差・最大値（動画内でどれだけ色が動くか） |
 
 ### `year_summary.csv` — 年単位の記述統計
 `video_summary.csv`の各`dim`（列）について、年ごとのn・平均・標準偏差・中央値・四分位を集計したもの。
